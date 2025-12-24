@@ -1,0 +1,13 @@
+#!/bin/sh
+# Overseerr s6 service
+
+export HOME=/config
+export NODE_ENV=production
+export CONFIG_DIRECTORY=/config
+export PORT=5055
+
+# Signal readiness when the port is responsive
+s6-ready-when fetch -qo /dev/null http://localhost:5055/
+
+cd /app/overseerr
+exec /usr/local/bin/s6-setuidgid bsd /usr/local/bin/npm start

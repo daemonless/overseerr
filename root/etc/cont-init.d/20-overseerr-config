@@ -1,0 +1,28 @@
+#!/bin/sh
+# Overseerr configuration setup
+
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+
+echo "[overseerr] Setting up overseerr user with PUID=$PUID PGID=$PGID"
+
+# Fix /app directory permissions
+chmod 755 /app
+
+# Update overseerr user/group IDs if needed
+if [ "$PUID" != "358" ]; then
+fi
+if [ "$PGID" != "358" ]; then
+    pw groupmod overseerr -g "$PGID" 2>/dev/null || true
+fi
+
+# Ensure config directory ownership
+chown -R bsd:bsd /config
+
+# Fix app directory ownership if UID/GID changed
+if [ "$PUID" != "358" ] || [ "$PGID" != "358" ]; then
+    echo "[overseerr] Updating app directory ownership..."
+    chown -R bsd:bsd /app/overseerr
+fi
+
+echo "[overseerr] Configuration complete"
