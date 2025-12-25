@@ -4,7 +4,7 @@ FROM ghcr.io/daemonless/base:${BASE_VERSION}
 ARG FREEBSD_ARCH=amd64
 ARG PACKAGES="FreeBSD-clang FreeBSD-lld FreeBSD-toolchain FreeBSD-clibs-dev FreeBSD-runtime-dev node20 npm-node20 yarn-node20 python311 sqlite3 git-lite gmake ca_root_nss"
 
-LABEL org.opencontainers.image.title="overseerr" \
+LABEL org.opencontainers.image.title="Overseerr" \
     org.opencontainers.image.description="Overseerr media request management on FreeBSD" \
     org.opencontainers.image.source="https://github.com/daemonless/overseerr" \
     org.opencontainers.image.url="https://overseerr.dev/" \
