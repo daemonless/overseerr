@@ -6,7 +6,7 @@ FROM ghcr.io/daemonless/base:${BASE_VERSION} AS builder
 
 # Build dependencies
 RUN pkg update && pkg install -y \
-    node20 npm-node20 python311 \
+    node20 npm-node20 yarn-node20 python311 \
     gmake pkgconf sqlite3 \
     FreeBSD-clang FreeBSD-lld FreeBSD-toolchain FreeBSD-clibs-dev FreeBSD-runtime-dev \
     ca_root_nss \
@@ -30,10 +30,16 @@ RUN OVERSEERR_VERSION=$(fetch -qo - "https://api.github.com/repos/sct/overseerr/
 
 WORKDIR /app/overseerr
 
-RUN CYPRESS_INSTALL_BINARY=0 npm install --legacy-peer-deps && \
-    npm run build && \
-    npm prune --production --legacy-peer-deps && \
-    rm -rf src server .next/cache node_modules/.cache
+RUN CYPRESS_INSTALL_BINARY=0 yarn install --frozen-lockfile --network-timeout 1000000 && \
+    yarn build && \
+    yarn install --production --ignore-scripts --prefer-offline && \
+    rm -rf src server .next/cache node_modules/.cache && \
+    find node_modules -name "*.d.ts" -delete && \
+    find node_modules -name "*.map" -delete && \
+    find node_modules -name "*.md" -delete && \
+    find node_modules -type d -name "test" -exec rm -rf {} + 2>/dev/null || true && \
+    find node_modules -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
+    find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true
 
 # Production image
 FROM ghcr.io/daemonless/base:${BASE_VERSION}
