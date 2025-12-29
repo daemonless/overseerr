@@ -6,8 +6,8 @@ FROM ghcr.io/daemonless/base:${BASE_VERSION} AS builder
 
 # Build dependencies
 RUN pkg update && pkg install -y \
-    node20 npm-node20 yarn-node20 python311 \
-    gmake pkgconf sqlite3 git-lite \
+    node20 npm-node20 python311 \
+    gmake pkgconf sqlite3 \
     FreeBSD-clang FreeBSD-lld FreeBSD-toolchain FreeBSD-clibs-dev FreeBSD-runtime-dev \
     ca_root_nss \
     && pkg clean -ay
@@ -16,22 +16,24 @@ RUN pkg update && pkg install -y \
 RUN ln -sf /usr/bin/clang /usr/bin/cc && \
     ln -sf /usr/bin/clang++ /usr/bin/c++
 
-# Clone and build Overseerr
+# Get latest release and download
 ENV PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
-RUN mkdir -p /app/overseerr && \
-    fetch -qo - "https://github.com/sct/overseerr/archive/refs/heads/develop.tar.gz" | \
+RUN OVERSEERR_VERSION=$(fetch -qo - "https://api.github.com/repos/sct/overseerr/releases/latest" | \
+        sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p') && \
+    echo "Building Overseerr ${OVERSEERR_VERSION}" && \
+    mkdir -p /app/overseerr && \
+    fetch -qo - "https://github.com/sct/overseerr/archive/refs/tags/${OVERSEERR_VERSION}.tar.gz" | \
     tar xzf - -C /app/overseerr --strip-components=1 && \
-    cd /app/overseerr && \
-    grep '"version"' package.json | head -1 | cut -d '"' -f 4 > /app/version
+    echo "${OVERSEERR_VERSION#v}" > /app/version
 
 WORKDIR /app/overseerr
 
 RUN CYPRESS_INSTALL_BINARY=0 npm install --legacy-peer-deps && \
     npm run build && \
     npm prune --production --legacy-peer-deps && \
-    rm -rf src server .next/cache
+    rm -rf src server .next/cache node_modules/.cache
 
 # Production image
 FROM ghcr.io/daemonless/base:${BASE_VERSION}
@@ -50,9 +52,8 @@ LABEL org.opencontainers.image.title="Overseerr" \
     io.daemonless.port="5055" \
     io.daemonless.arch="${FREEBSD_ARCH}" \
     io.daemonless.category="Media Management" \
-    io.daemonless.upstream-mode="github_commits" \
+    io.daemonless.upstream-mode="github" \
     io.daemonless.upstream-repo="sct/overseerr" \
-    io.daemonless.upstream-branch="develop" \
     io.daemonless.packages="${PACKAGES}"
 
 # Runtime dependencies only
