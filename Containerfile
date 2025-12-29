@@ -68,13 +68,12 @@ RUN pkg update && \
     pkg clean -ay && \
     rm -rf /var/cache/pkg/* /var/db/pkg/repos/*
 
-# Copy built application from builder
-COPY --from=builder /app/overseerr /app/overseerr
-COPY --from=builder /app/version /app/version
+# Copy built application from builder (with correct ownership)
+COPY --from=builder --chown=bsd:bsd /app/overseerr /app/overseerr
+COPY --from=builder --chown=bsd:bsd /app/version /app/version
 
-# Create directories and fix permissions
-RUN mkdir -p /config && \
-    chown -R bsd:bsd /config /app
+# Create config directory
+RUN mkdir -p /config && chown bsd:bsd /config
 
 # Copy service files
 COPY root/ /
