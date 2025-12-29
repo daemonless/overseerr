@@ -1,8 +1,43 @@
+# Overseerr - Media request management
+# Multi-stage build: compile with npm, run with node only
+
 ARG BASE_VERSION=15
+FROM ghcr.io/daemonless/base:${BASE_VERSION} AS builder
+
+# Build dependencies
+RUN pkg update && pkg install -y \
+    node20 npm-node20 yarn-node20 python311 \
+    gmake pkgconf sqlite3 git-lite \
+    FreeBSD-clang FreeBSD-lld FreeBSD-toolchain FreeBSD-clibs-dev FreeBSD-runtime-dev \
+    ca_root_nss \
+    && pkg clean -ay
+
+# Symlink compilers
+RUN ln -sf /usr/bin/clang /usr/bin/cc && \
+    ln -sf /usr/bin/clang++ /usr/bin/c++
+
+# Clone and build Overseerr
+ENV PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+RUN mkdir -p /app/overseerr && \
+    fetch -qo - "https://github.com/sct/overseerr/archive/refs/heads/develop.tar.gz" | \
+    tar xzf - -C /app/overseerr --strip-components=1 && \
+    cd /app/overseerr && \
+    grep '"version"' package.json | head -1 | cut -d '"' -f 4 > /app/version
+
+WORKDIR /app/overseerr
+
+RUN CYPRESS_INSTALL_BINARY=0 npm install --legacy-peer-deps && \
+    npm run build && \
+    npm prune --production --legacy-peer-deps && \
+    rm -rf src server .next/cache
+
+# Production image
 FROM ghcr.io/daemonless/base:${BASE_VERSION}
 
 ARG FREEBSD_ARCH=amd64
-ARG PACKAGES="FreeBSD-clang FreeBSD-lld FreeBSD-toolchain FreeBSD-clibs-dev FreeBSD-runtime-dev node20 npm-node20 yarn-node20 python311 sqlite3 git-lite gmake ca_root_nss"
+ARG PACKAGES="node20"
 
 LABEL org.opencontainers.image.title="Overseerr" \
     org.opencontainers.image.description="Overseerr media request management on FreeBSD" \
@@ -20,47 +55,23 @@ LABEL org.opencontainers.image.title="Overseerr" \
     io.daemonless.upstream-branch="develop" \
     io.daemonless.packages="${PACKAGES}"
 
-# Install build dependencies from ports and pkgbase
-# (FreeBSD-base repo is already configured in base image)
+# Runtime dependencies only
 RUN pkg update && \
-    pkg install -y \
-    ${PACKAGES} && \
+    pkg install -y ${PACKAGES} && \
     pkg clean -ay && \
-    rm -rf /var/cache/pkg/* && \
-    ln -sf /usr/bin/clang /usr/bin/cc && \
-    ln -sf /usr/bin/clang++ /usr/bin/c++
+    rm -rf /var/cache/pkg/* /var/db/pkg/repos/*
 
-# Create overseerr user
+# Copy built application from builder
+COPY --from=builder /app/overseerr /app/overseerr
+COPY --from=builder /app/version /app/version
 
-# Clone and build Overseerr
-ENV PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-ENV NODE_OPTIONS="--max-old-space-size=2048"
-RUN mkdir -p /app/overseerr && \
-    chmod 755 /app && \
-    fetch -qo - "https://github.com/sct/overseerr/archive/refs/heads/develop.tar.gz" | \
-    tar xzf - -C /app/overseerr --strip-components=1 && \
-    cd /app/overseerr && \
-    OVERSEERR_VERSION=$(grep '"version"' package.json | head -1 | cut -d '"' -f 4) && \
-    echo "$OVERSEERR_VERSION" > /app/version && \
-    CYPRESS_INSTALL_BINARY=0 npm install --legacy-peer-deps && \
-    npm run build && \
-    npm prune --production --legacy-peer-deps && \
-    rm -rf src server .next/cache && \
-    chown -R bsd:bsd /app/overseerr
-
-# Create config directory
+# Create directories and fix permissions
 RUN mkdir -p /config && \
-    chown -R bsd:bsd /config
+    chown -R bsd:bsd /config /app
 
-# Copy service definition and init scripts
+# Copy service files
 COPY root/ /
-
-# Make scripts executable
-RUN chmod +x /etc/services.d/overseerr/run /etc/cont-init.d/* 2>/dev/null || true
-
-# Set up s6 service link
+RUN chmod +x /etc/services.d/*/run /etc/cont-init.d/* 2>/dev/null || true
 
 EXPOSE 5055
 VOLUME /config
-
-
