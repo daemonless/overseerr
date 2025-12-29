@@ -10,4 +10,4 @@ export PORT=5055
 s6-ready-when fetch -qo /dev/null http://localhost:5055/
 
 cd /app/overseerr
-exec /usr/local/bin/s6-setuidgid bsd /usr/local/bin/npm start
+exec /usr/local/bin/s6-setuidgid bsd /usr/local/bin/node dist/index.js
