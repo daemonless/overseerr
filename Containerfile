@@ -47,7 +47,7 @@ FROM ghcr.io/daemonless/base:${BASE_VERSION}
 ARG FREEBSD_ARCH=amd64
 ARG PACKAGES="node20"
 ARG UPSTREAM_URL="https://api.github.com/repos/sct/overseerr/releases/latest"
-ARG UPSTREAM_SED="s/.*\"tag_name\":\"\\([^\"]*\\)\".*/\\1/p"
+ARG UPSTREAM_JQ=".tag_name"
 
 LABEL org.opencontainers.image.title="Overseerr" \
     org.opencontainers.image.description="Overseerr media request management on FreeBSD" \
@@ -61,7 +61,7 @@ LABEL org.opencontainers.image.title="Overseerr" \
     io.daemonless.arch="${FREEBSD_ARCH}" \
     io.daemonless.category="Media Management" \
     io.daemonless.upstream-url="${UPSTREAM_URL}" \
-    io.daemonless.upstream-sed="${UPSTREAM_SED}" \
+    io.daemonless.upstream-jq="${UPSTREAM_JQ}" \
     io.daemonless.packages="${PACKAGES}"
 
 # Runtime dependencies only
