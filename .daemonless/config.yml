@@ -1,0 +1,4 @@
+icon: ':material-eye:'
+cit:
+  mode: port
+  port: 5055
