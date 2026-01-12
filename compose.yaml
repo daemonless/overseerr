@@ -1,0 +1,39 @@
+name: overseerr
+
+x-daemonless:
+  title: "Overseerr"
+  icon: ":material-eye:"
+  category: "Media Management"
+  description: "Overseerr media request management on FreeBSD."
+  upstream_url: "https://github.com/sct/overseerr"
+  web_url: "https://overseerr.dev/"
+  freshports_url: "https://www.freshports.org/www/overseerr/"
+  user: "bsd"
+  mlock: false
+  
+  docs:
+    env:
+      PUID: "User ID for the application process"
+      PGID: "Group ID for the application process"
+      TZ: "Timezone for the container"
+    volumes:
+      /config: "Configuration directory"
+    ports:
+      5055: "Web UI"
+
+services:
+  overseerr:
+    image: ghcr.io/daemonless/overseerr:latest
+    container_name: overseerr
+    restart: unless-stopped
+    
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+
+    volumes:
+      - /path/to/containers/overseerr:/config
+
+    ports:
+      - 5055:5055
