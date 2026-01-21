@@ -11,6 +11,7 @@ Overseerr media request management on FreeBSD.
 |---|---|
 | **Port** | 5055 |
 | **Registry** | `ghcr.io/daemonless/overseerr` |
+| **Docs** | [daemonless.io/images/overseerr](https://daemonless.io/images/overseerr/) |
 | **Source** | [https://github.com/sct/overseerr](https://github.com/sct/overseerr) |
 | **Website** | [https://overseerr.dev/](https://overseerr.dev/) |
 
