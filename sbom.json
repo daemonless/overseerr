@@ -1,11 +1,11 @@
 {
   "image": "overseerr",
-  "generated": "2026-02-01T22:52:53Z",
+  "generated": "2026-02-02T13:47:44Z",
   "tags": {
     "latest": {
       "app_version": "1.34.0",
       "source": "upstream-binary",
-      "generated": "2026-02-01T22:52:36Z",
+      "generated": "2026-02-02T13:42:18Z",
       "packages": {
         "freebsd": [
           {
