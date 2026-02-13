@@ -1,12 +1,12 @@
 {
   "image": "overseerr",
-  "generated": "2026-02-06T00:18:49Z",
+  "generated": "2026-02-13T12:20:48Z",
   "tags": {
     "latest": {
       "arch": "amd64",
       "app_version": "1.34.0",
-      "source": "upstream-binary",
-      "generated": "2026-02-06T00:16:00Z",
+      "source": "upstream",
+      "generated": "2026-02-13T12:20:31Z",
       "packages": {
         "freebsd": [
           {
@@ -15,7 +15,7 @@
           },
           {
             "name": "FreeBSD-blocklist",
-            "version": "15.0"
+            "version": "15.0p3"
           },
           {
             "name": "FreeBSD-bzip2-lib",
@@ -199,7 +199,8 @@
           }
         ],
         "dotnet": [],
-        "python": [],
+        "go": [],
+        "java": [],
         "node": [
           {
             "name": "@ampproject/remapping",
@@ -3970,14 +3971,21 @@
             "version": "3.20.6"
           }
         ],
-        "go": []
+        "php": [],
+        "python": [],
+        "ruby": [],
+        "rust": []
       },
       "summary": {
         "freebsd": 47,
         "dotnet": 0,
-        "python": 0,
-        "node": 942,
         "go": 0,
+        "java": 0,
+        "node": 942,
+        "php": 0,
+        "python": 0,
+        "ruby": 0,
+        "rust": 0,
         "total": 989
       }
     }
