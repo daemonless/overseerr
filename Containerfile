@@ -59,7 +59,7 @@ ENV HEALTHCHECK_URL="${HEALTHCHECK_ENDPOINT}"
 
 # --- Metadata (Injected by Generator) ---
 LABEL org.opencontainers.image.title="Overseerr" \
-      org.opencontainers.image.description="Overseerr media request management on FreeBSD." \
+      org.opencontainers.image.description="Overseerr media request management on FreeBSD. **Deprecated** — Overseerr is no longer maintained. Migrate to [Seerr](https://github.com/daemonless/seerr): copy /containers/overseerr to /containers/seerr and deploy. Seerr auto-migrates config." \
       org.opencontainers.image.source="https://github.com/daemonless/overseerr" \
       org.opencontainers.image.url="https://overseerr.dev/" \
       org.opencontainers.image.documentation="https://docs.overseerr.dev/" \

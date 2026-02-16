@@ -5,7 +5,7 @@ Source: daemonless/templates/README.j2
 
 # Overseerr
 
-Overseerr media request management on FreeBSD.
+Overseerr media request management on FreeBSD. **Deprecated** — Overseerr is no longer maintained. Migrate to [Seerr](https://github.com/daemonless/seerr): copy /containers/overseerr to /containers/seerr and deploy. Seerr auto-migrates config.
 
 | | |
 |---|---|
