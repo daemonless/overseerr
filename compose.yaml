@@ -4,12 +4,18 @@ x-daemonless:
   title: "Overseerr"
   icon: ":material-eye:"
   category: "Media Management"
-  description: "Overseerr media request management on FreeBSD. **Deprecated** — Overseerr is no longer maintained. Migrate to [Seerr](https://github.com/daemonless/seerr): copy /containers/overseerr to /containers/seerr and deploy. Seerr auto-migrates config."
+  description: "Media request management for Plex ecosystems."
   upstream_url: "https://github.com/sct/overseerr"
   web_url: "https://overseerr.dev/"
   freshports_url: "https://www.freshports.org/www/overseerr/"
   user: "bsd"
   mlock: false
+  deprecated:
+    reason: "Upstream is no longer maintained."
+    replacement: "seerr"
+    migration_guide: |
+      Stop overseerr, copy /containers/overseerr → /containers/seerr,
+      deploy seerr — it auto-migrates config.
   
   docs:
     env:
